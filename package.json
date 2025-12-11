@@ -11,7 +11,9 @@
   "dependencies": {
     "next": "15.0.5",
     "react": "^19.2.1",
-    "react-dom": "^19.2.1"
+    "react-dom": "^19.2.1",
+    "react-force-graph-2d": "^1.29.0",
+    "vis-network": "^10.0.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
