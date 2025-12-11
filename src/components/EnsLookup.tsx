@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface EnsData {
   name: string;
@@ -13,8 +13,14 @@ interface EnsData {
   resolver?: string;
   registrant?: string;
   expiry_date?: string;
-  is_primary_name?: boolean;     // this is the correct field
+  is_primary_name?: boolean;
   [key: string]: unknown;
+}
+
+function getQueryParam(param: string): string | null {
+  if (typeof window === "undefined") return null;
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
 }
 
 export default function EnsLookup() {
@@ -22,6 +28,14 @@ export default function EnsLookup() {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<EnsData | null>(null);
   const [error, setError] = useState<string>("");
+
+  // Prefill input from query param
+  useEffect(() => {
+    const name = getQueryParam("name");
+    if (name) {
+      setInput(name);
+    }
+  }, []);
 
   const search = async (): Promise<void> => {
     if (!input) return;
@@ -50,6 +64,13 @@ export default function EnsLookup() {
     }
   };
 
+  // Handle Enter key
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      search();
+    }
+  };
+
   return (
     <div className="max-w-xl mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold text-center">ENS Lookup</h1>
@@ -61,6 +82,7 @@ export default function EnsLookup() {
           placeholder="vitalik.eth or 0x1234..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <button
           type="button"
@@ -88,11 +110,12 @@ export default function EnsLookup() {
             )}
 
             <div>
-<h2 className="text-xl font-semibold">
-  {typeof data.ens === "string" 
-    ? data.ens 
-    : data.name ?? "No ENS name"}
-</h2>              {data.address && (
+              <h2 className="text-xl font-semibold">
+                {typeof data.ens === "string"
+                  ? data.ens
+                  : data.name ?? "No ENS name"}
+              </h2>
+              {data.address && (
                 <p className="text-gray-600 dark:text-gray-400 text-sm break-all">
                   {data.address}
                 </p>
